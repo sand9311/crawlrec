@@ -75,6 +75,10 @@ class Recorder:
         if pending:
             for t in pending:
                 t.cancel()
+            try:
+                await asyncio.gather(*pending, return_exceptions=True)
+            except Exception:
+                pass
 
         os._exit(0)
 
@@ -219,9 +223,8 @@ class Recorder:
                     await self.safe_stop()
                     return
 
-                # await page.goto(self.url, wait_until="domcontentloaded")
                 try:
-                    await asyncio.wait_for(page.goto(self.url, wait_until="networkidle"), timeout=30)
+                    await asyncio.wait_for(page.goto(self.url, wait_until="domcontentloaded"), timeout=30)
                 except Exception as TimeoutError:
                     log(f"{self.url} not reachable (30sec timeout)")
                     return
