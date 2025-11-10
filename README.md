@@ -17,14 +17,11 @@ It includes stealth behavior, randomized user agents, and graceful shutdown hand
 
 ## Installation
 
-Clone the repository and install dependencies:
-
 ```bash
 pip install git+https://github.com/stexz01/crawlrec.git
 ```
 
 CrawlRec requires:
-- Python **3.9+**
 - Playwright browsers (installed via `playwright install`)
 
 ---
