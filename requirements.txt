@@ -1,2 +1,2 @@
-playwright>=1.48.0
-InquirerPy>=0.3.4
+playwright==1.55.0
+textual==6.6.0

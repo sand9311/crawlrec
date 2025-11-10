@@ -1,7 +1,7 @@
 import argparse, asyncio
 from .recorder import Recorder
 from .extractor import Extractor
-from .utils import YELLOW, SmartFormatter, log, BOLD, RED, RESET
+from .utils import SmartFormatter, log, BOLD, YELLOW, RED, RESET
 
 def main():
     parser = argparse.ArgumentParser(
@@ -38,9 +38,11 @@ def main():
         except KeyboardInterrupt:
             log("\nInterrupted. Saving & exiting safely.", color=YELLOW)
             try:
-                asyncio.run(rec.safe_stop())
+                asyncio.run(rec.safe_stop("cli.py"))
+                pass
             except Exception:
                 pass
+        
     elif args.cmd == "extract":
         ext = Extractor(args.url, args.file, args.headful)
         try:

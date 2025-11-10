@@ -1,4 +1,5 @@
 import argparse, random
+from playwright.async_api import async_playwright
 from datetime import datetime
 
 # ANSI colors
@@ -10,28 +11,21 @@ CYAN = "\033[36m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
-
 CHROME_BASES = [
     ("Windows NT 10.0; Win64; x64", "Chrome"),
     ("Macintosh; Intel Mac OS X 10_15_7", "Safari"),
     ("X11; Linux x86_64", "Chrome"),
 ]
 
-"""
-2025	
-Current Stable Chrome	
-Good Range
-131, 135  (OR) 128, 136
-"""
-
-CHROME_MAJOR_MIN = (128, 136)
-CHROME_BUILD_MIN = 1000
-CHROME_BUILD_MAX = 9999
-
 def random_chrome_ua():
+    """
+    YEAR 2025	
+    Current Stable Chrome	Versions
+    Good Range: 128, 136
+    """
     platform, family = random.choice(CHROME_BASES)
-    major = random.randint(*CHROME_MAJOR_MIN)
-    build = random.randint(CHROME_BUILD_MIN, CHROME_BUILD_MAX)
+    major = random.randint(*(128, 136))
+    build = random.randint(1000, 9999)
     build2 = random.randint(0,99)
     if family == "Chrome":
         return (f"Mozilla/5.0 ({platform}) AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -41,7 +35,7 @@ def random_chrome_ua():
         return (f"Mozilla/5.0 ({platform}) AppleWebKit/605.1.15 (KHTML, like Gecko) "
                 f"Version/{version} Safari/605.1.15")
         
-# for multiple parallel crawlers, assign a different UA to each worker. (future additional)
+# for multiple parallel crawlers, assign a different UA to each worker. (future additional :)
 def ua_pool(n=8):
     base = [random_chrome_ua() for _ in range(n)]
     base += [
@@ -157,13 +151,40 @@ STEALTH_JS = r"""
 })();
 """
 
+async def launch_browser(headless_=False):
+    p = await async_playwright().start()
+    
+    browser = await p.chromium.launch(
+        headless=headless_,
+        slow_mo=random.randint(10,200),
+        args=[
+            # "--disable-http2",
+            "--no-sandbox",
+            "--disable-blink-features=AutomationControlled",
+        ],
+    )
+    
+    ctx = await browser.new_context(
+        ignore_https_errors=True,
+        user_agent=random_chrome_ua(),
+        viewport={"width": random.randint(1200, 1600),
+                  "height": random.randint(700, 1000)},
+        locale="en-US",
+        timezone_id=random.choice(["America/New_York","Europe/London","Asia/Kolkata"]),
+    )
+
+    await ctx.set_extra_http_headers({"accept-language": "en-US,en;q=0.9"})
+    await ctx.add_init_script(STEALTH_JS)
+
+    return browser, ctx
+
+
 def log(msg, icon="", color=RED, end="\n"):
-    """Unified styled console logger."""
     timestamp = datetime.now().strftime("%H:%M:%S")
     print(f"{BOLD}{color}[{timestamp}] {icon} {msg}{RESET}", end=end)
 
+
 class SmartFormatter(argparse.HelpFormatter):
-    """Better argparse formatter for subcommands."""
     def _format_action(self, action):
         parts = super()._format_action(action)
         if isinstance(action, argparse._SubParsersAction):

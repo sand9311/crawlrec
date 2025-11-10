@@ -1,16 +1,16 @@
 import os, json, random, asyncio
-from playwright.async_api import async_playwright
-from .utils import random_chrome_ua, STEALTH_JS, log, YELLOW
+from .utils import launch_browser, log, YELLOW, RED
 
 class Extractor:
     def __init__(self, url, template, headful=False):
         self.file = template
         self.url = url
         self.headless = not headful
+        self._error = False
         
     async def run(self):
         if not os.path.exists(self.file):
-            log("❌ JSON file not found.", color=YELLOW)
+            log("❌ JSON file not found.", color=RED)
             return
         data = json.load(open(self.file))
         if not self.url: self.url = data.get("url")
@@ -19,43 +19,45 @@ class Extractor:
             log(f"No actions/recorded found in {self.file}", color=YELLOW)
             return
 
-        async with async_playwright() as p:
-            ctx = await p.chromium.launch_persistent_context(
-                headless=self.headless,                     # headful for more human
-                slow_mo=random.randint(10,200),
-                user_agent=random_chrome_ua(),
-                viewport={"width": random.randint(1200, 1600), "height": random.randint(700, 1000)},
-                locale="en-US",
-                timezone_id=random.choice(["America/New_York","Europe/London","Asia/Kolkata"]),
-                args=["--no-sandbox", "--disable-blink-features=AutomationControlled"],
-            )
-            await ctx.set_extra_http_headers({"accept-language":"en-US,en;q=0.9"})
-            await ctx.add_init_script(STEALTH_JS)
-            page = ctx.pages[0] if ctx.pages else await ctx.new_page()
-            
-            try:
-                await asyncio.wait_for(page.goto(self.url, wait_until="networkidle"), timeout=30)
-            except Exception as TimeoutError:
-                log(f"{self.url} not reachable (30sec timeout)")
-                return
+        browser, ctx = await launch_browser(self.headless)
+        page = ctx.pages[0] if ctx.pages else await ctx.new_page()
+        
+        await page.route("**/*", lambda route, req: 
+    route.abort() if req.resource_type in ["image","media","font"] else route.continue_())
 
-            for a in acts:
-                try:
-                    el = await page.query_selector(a["selector"]) or \
-                         await page.query_selector(f"xpath={a['xpathSelector']}")
-                    if not el:
-                        print("❌ not found")
-                        continue
-                    if a["extract"] == "text":
-                        val = await el.inner_text()
-                    elif a["extract"] == "href":
-                        val = await el.get_attribute("href")
-                    elif a["extract"] == "value":
-                        val = await el.input_value()
-                    else:
-                        val = await el.inner_text()
-                    print(val)
-                except Exception as e:
-                    log(f"Extraction Error: {e}")
-            await ctx.close()
+        try:
+            # await page.goto(self.url, wait_until="networkidle") # stucks in never ending network api/ads calls....
+            await asyncio.wait_for(page.goto(self.url, wait_until="domcontentloaded"), timeout=30) # soft networkidle: domcontentloaded + sleep
+            await asyncio.sleep(random.randint(2,4))
             
+        except TimeoutError:
+            self._error = True
+            log(f"This site can't be reached: {self.url}", color=RED)
+        except:
+            self._error = True
+            log("(detected) site blocks automation aggressively. Use --headful")
+        finally:
+            if self._error:
+                await ctx.close(), await browser.close()
+                return
+                
+
+        for a in acts:
+            try:
+                el = await page.query_selector(a["selector"]) or \
+                        await page.query_selector(f"xpath={a['xpathSelector']}")
+                if not el:
+                    print("❌ not found")
+                    continue
+                if a["extractType"] == "text":
+                    val = await el.inner_text()
+                elif a["extractType"] == "href":
+                    val = await el.get_attribute("href")
+                elif a["extractType"] == "value":
+                    val = await el.input_value()
+                else:
+                    val = await el.inner_text()
+                print(val)
+            except Exception as e:
+                log(f"Extraction Error: {e}")
+        await ctx.close(), await browser.close()

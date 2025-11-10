@@ -20,7 +20,7 @@ It includes stealth behavior, randomized user agents, and graceful shutdown hand
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/stexz01/crawlrec.git && cd crawlrec && pip install -e . && playwright install
+pip install git+https://github.com/stexz01/crawlrec.git
 ```
 
 CrawlRec requires:
