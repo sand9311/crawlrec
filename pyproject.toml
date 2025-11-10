@@ -21,3 +21,9 @@ Issues = "https://github.com/stexz01/crawlrec/issues"
 
 [project.scripts]
 crawlrec = "crawlrec.cli:main"
+
+[tool.setuptools]
+packages = ["crawlrec"]
+
+[tool.setuptools.package-data]
+crawlrec = ["rec.js"]
