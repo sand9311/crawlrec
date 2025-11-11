@@ -36,11 +36,10 @@ class Extractor:
         except:
             self._error = True
             log("(detected) site blocks automation aggressively. Use --headful")
-        finally:
-            if self._error:
-                await ctx.close(), await browser.close()
-                return
-                
+            
+        if self._error:
+            await ctx.close(), await browser.close()
+            return
 
         for a in acts:
             try:
